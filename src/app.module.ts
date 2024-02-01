@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import mongodb from 'config/mongodb';
+import mongodb from 'config/mongodb.config';
 import { AuthModule } from 'auth/auth.module';
-import jwt from 'config/jwt';
+import jwt from 'config/jwt.config';
 
 @Module({
   imports: [
