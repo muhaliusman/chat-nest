@@ -31,6 +31,10 @@ describe('UsersService', () => {
     userModel = module.get<Model<User>>(getModelToken(User.name));
   });
 
+  afterEach(async () => {
+    jest.clearAllMocks();
+  });
+
   describe('findAll', () => {
     it('should find all users', async () => {
       const users = [

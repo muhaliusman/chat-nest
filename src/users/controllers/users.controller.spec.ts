@@ -30,13 +30,21 @@ describe('UsersController', () => {
     service = module.get<UsersService>(UsersService);
   });
 
+  afterEach(async () => {
+    jest.clearAllMocks();
+  });
+
   describe('create', () => {
     it('should create a new user', async () => {
       const createUserDTO: CreateUserDTO = {
         username: 'test',
         password: 'test',
       };
-      const userMock = { _id: new mongoose.Types.ObjectId(), username: 'test', password: 'hashedPassword' };
+      const userMock = {
+        _id: new mongoose.Types.ObjectId(),
+        username: 'test',
+        password: 'hashedPassword',
+      };
 
       jest.spyOn(service, 'create').mockResolvedValue(userMock);
 
