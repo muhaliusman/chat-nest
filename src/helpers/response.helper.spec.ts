@@ -1,45 +1,60 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 import { ResponseHelper } from './response.helper';
 
 describe('ResponseHelper', () => {
-  test('success method should return a success response', () => {
-    const message = 'Test success message';
-    const data = { key: 'value' };
+  describe('success method', () => {
+    it('should return a success response with message and data', () => {
+      const message = 'Success message';
+      const data = { key: 'value' };
 
-    const result = ResponseHelper.success(message, data);
+      const result = ResponseHelper.success(message, data);
 
-    expect(result.success).toBe(true);
-    expect(result.data).toBe(data);
-    expect(result.message).toBe(message);
+      expect(result).toEqual({
+        success: true,
+        data,
+        message,
+      });
+    });
+
+    it('should return a success response with only message if no data provided', () => {
+      const message = 'Success message';
+
+      const result = ResponseHelper.success(message);
+
+      expect(result).toEqual({
+        success: true,
+        message,
+      });
+    });
   });
 
-  test('success method should return a success response without data', () => {
-    const message = 'Test success message';
+  describe('error method', () => {
+    it('should return an error response with status and message from HttpException', () => {
+      const res: Partial<Response> = { status: jest.fn() };
+      const status = HttpStatus.BAD_REQUEST;
+      const error = new HttpException('Error message', status);
 
-    const result = ResponseHelper.success(message);
+      const result = ResponseHelper.error(res as Response, error);
 
-    expect(result.success).toBe(true);
-    expect(result.data).toBeUndefined();
-    expect(result.message).toBe(message);
-  });
+      expect(res.status).toHaveBeenCalledWith(status);
+      expect(result).toEqual({
+        success: false,
+        message: 'Error message',
+      });
+    });
 
-  test('error method should return an error response', () => {
-    const message = 'Test error message';
-    const data = { key: 'value' };
+    it('should return an error response with status 500 and default message if not HttpException', () => {
+      const res: Partial<Response> = { status: jest.fn() };
+      const error = new Error('Generic error');
 
-    const result = ResponseHelper.error(message, data);
+      const result = ResponseHelper.error(res as Response, error);
 
-    expect(result.success).toBe(false);
-    expect(result.data).toBe(data);
-    expect(result.message).toBe(message);
-  });
-
-  test('error method should return an error response without data', () => {
-    const message = 'Test error message';
-
-    const result = ResponseHelper.error(message);
-
-    expect(result.success).toBe(false);
-    expect(result.data).toBeUndefined();
-    expect(result.message).toBe(message);
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+      expect(result).toEqual({
+        success: false,
+        message: error.message,
+      });
+    });
   });
 });
