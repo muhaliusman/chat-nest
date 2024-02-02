@@ -1,15 +1,17 @@
+import { RabbitMQConfig } from '@golevelup/nestjs-rabbitmq';
 import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
 
 dotenvConfig({ path: '.env' });
 
-const config = {
-  urls: [process.env.RABBITMQ_URL],
-  queue: process.env.RABBITMQ_QUEUE_NAME,
-  noAck: false,
-  queueOptions: {
-    durable: true,
-  },
+const config: RabbitMQConfig = {
+  uri: [process.env.RABBITMQ_URI],
+  exchanges: [
+    {
+      name: 'events',
+      type: 'topic',
+    },
+  ],
 };
 
 export default registerAs('rabbitmq', () => config);

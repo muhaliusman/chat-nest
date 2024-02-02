@@ -9,7 +9,7 @@ import {
 import { Message, MessageSchema } from './schemas/message.schema';
 import { AuthModule } from 'auth/auth.module';
 import { UsersModule } from 'users/users.module';
-import { MessageProducersModule } from 'message-producers/message-producers.module';
+import { EventHandlersModule } from 'event-handlers/event-handlers.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { MessageProducersModule } from 'message-producers/message-producers.modu
     ]),
     AuthModule,
     UsersModule,
-    MessageProducersModule,
+    EventHandlersModule,
   ],
   providers: [ConversationsService],
   controllers: [ConversationsController],

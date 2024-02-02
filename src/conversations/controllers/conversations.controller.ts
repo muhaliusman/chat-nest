@@ -12,10 +12,10 @@ import {
 import { AuthGuard } from 'auth/guards/auth.guard';
 import { CreateConversationDTO } from 'conversations/dto/create-conversation.dto';
 import { ConversationsService } from 'conversations/services/conversations.service';
+import { ConversationConsumersService } from 'event-handlers/services/conversation-consumers.service';
+import { ProducersService } from 'event-handlers/services/producers.service';
 import { Response } from 'express';
 import { ResponseHelper, ResponseObject } from 'helpers/response.helper';
-import { MessageConsumersService } from 'message-consumers/services/message-consumers.service';
-import { MessageProducersService } from 'message-producers/services/message-producers.service';
 import { Types } from 'mongoose';
 import { UsersService } from 'users/services/users.service';
 
@@ -24,7 +24,7 @@ export class ConversationsController {
   constructor(
     private readonly conversationService: ConversationsService,
     private readonly usersService: UsersService,
-    private readonly messageProducer: MessageProducersService,
+    private readonly producerService: ProducersService,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -50,6 +50,7 @@ export class ConversationsController {
           currentUserId,
           toUserId,
         ]);
+
       const messageData = {
         message: createConversation.message,
         sender: currentUserObjectId,
@@ -61,10 +62,11 @@ export class ConversationsController {
         messageData,
       );
 
-      await this.messageProducer.sendMessageToBroker(
-        MessageConsumersService.NEW_CONVERSATION_MESSAGE,
+      await this.producerService.sendMessageToBroker(
+        ConversationConsumersService.ROUTING_KEY,
         message,
       );
+
       return ResponseHelper.success('Message sent successfully', message);
     } catch (error: unknown) {
       return ResponseHelper.error(res, error);

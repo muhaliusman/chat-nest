@@ -13,14 +13,14 @@ import { getModelToken } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { MessageProducersService } from 'message-producers/services/message-producers.service';
-import { MessageConsumersService } from 'message-consumers/services/message-consumers.service';
+import { ProducersService } from 'event-handlers/services/producers.service';
+import { ConversationConsumersService } from 'event-handlers/services/conversation-consumers.service';
 
 describe('ConversationsController', () => {
   let controller: ConversationsController;
   let conversationService: ConversationsService;
   let usersService: UsersService;
-  let messageProducersService: MessageProducersService;
+  let producersService: ProducersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +53,7 @@ describe('ConversationsController', () => {
           },
         },
         {
-          provide: MessageProducersService,
+          provide: ProducersService,
           useValue: {
             sendMessageToBroker: jest.fn(),
           },
@@ -65,9 +65,7 @@ describe('ConversationsController', () => {
     conversationService =
       module.get<ConversationsService>(ConversationsService);
     usersService = module.get<UsersService>(UsersService);
-    messageProducersService = module.get<MessageProducersService>(
-      MessageProducersService,
-    );
+    producersService = module.get<ProducersService>(ProducersService);
   });
 
   describe('createConversation', () => {
@@ -117,8 +115,8 @@ describe('ConversationsController', () => {
         currentUserId.toString(),
         toUserId.toString(),
       ]);
-      expect(messageProducersService.sendMessageToBroker).toHaveBeenCalledWith(
-        MessageConsumersService.NEW_CONVERSATION_MESSAGE,
+      expect(producersService.sendMessageToBroker).toHaveBeenCalledWith(
+        ConversationConsumersService.ROUTING_KEY,
         message,
       );
       expect(findOneByIdSpy).toHaveBeenCalledWith(toUserId.toString());
