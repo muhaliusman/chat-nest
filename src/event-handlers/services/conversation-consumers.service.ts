@@ -8,6 +8,7 @@ import {
   ConversationMessage,
   RetryConversationMessage,
 } from 'event-handlers/interfaces/conversation-message.interface';
+import { WsGateway } from 'websockets/ws.gateway';
 
 @Injectable()
 export class ConversationConsumersService implements OnModuleInit {
@@ -19,7 +20,10 @@ export class ConversationConsumersService implements OnModuleInit {
   readonly MAX_RETRY = 5;
   readonly RETRY_DELAY_MULTIPLIER = 120000;
 
-  constructor(protected amqpConnection: AmqpConnection) {}
+  constructor(
+    private readonly amqpConnection: AmqpConnection,
+    private readonly wsGateway: WsGateway,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     // delete existing queue if empty to avoid error when assert new queue
@@ -80,7 +84,13 @@ export class ConversationConsumersService implements OnModuleInit {
   }
 
   private async processHandler(payload: ConversationMessage): Promise<void> {
-    console.log('Message received', payload);
+    const wsEvent = this.generateWsEvent(payload);
+
+    this.wsGateway.sendMessage(wsEvent, payload);
+  }
+
+  private generateWsEvent(payload: ConversationMessage): string {
+    return `conversation_${payload.sender}_${payload.receiver}`;
   }
 
   private sendToRetryQueue(data: RetryConversationMessage): void | never {

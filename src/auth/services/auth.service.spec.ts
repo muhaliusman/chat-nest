@@ -88,7 +88,10 @@ describe('AuthService', () => {
         password: 'password',
       } as LoginDto);
 
-      expect(result).toEqual({ access_token: 'mockedAccessToken' });
+      expect(result).toEqual({
+        access_token: 'mockedAccessToken',
+        user: { _id: user._id, username: user.username },
+      });
     });
   });
 });

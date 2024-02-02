@@ -4,6 +4,7 @@ import { AuthService } from '../services/auth.service';
 import { LoginDto } from '../dto/login.dto';
 import { ResponseHelper } from 'helpers/response.helper';
 import { Response } from 'express';
+import { Types } from 'mongoose';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -29,9 +30,13 @@ describe('AuthController', () => {
   describe('signIn', () => {
     it('should call authService.signIn with the correct parameters and return success response', async () => {
       const loginDto: LoginDto = { username: 'testuser', password: 'password' };
+      const expectedUser = {
+        _id: new Types.ObjectId(),
+        username: 'mockedUsername',
+      };
       const authServiceSpy = jest
         .spyOn(authServiceMock, 'signIn')
-        .mockResolvedValue({ access_token: 'mockedToken' });
+        .mockResolvedValue({ access_token: 'mockedToken', user: expectedUser });
 
       const res: Partial<Response> = { status: jest.fn() };
       const result = await authController.signIn(loginDto, res as Response);
@@ -40,6 +45,7 @@ describe('AuthController', () => {
       expect(result).toEqual(
         ResponseHelper.success('User logged in successfully', {
           access_token: 'mockedToken',
+          user: expectedUser,
         }),
       );
     });

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { ConversationConsumersService } from './conversation-consumers.service';
 import { ConversationMessage } from 'event-handlers/interfaces/conversation-message.interface';
+import { WsGateway } from 'websockets/ws.gateway';
 
 describe('ConversationConsumersService', () => {
   let service: ConversationConsumersService;
@@ -23,12 +24,22 @@ describe('ConversationConsumersService', () => {
           provide: AmqpConnection,
           useValue: amqpConnectionMock,
         },
+        {
+          provide: WsGateway,
+          useValue: {
+            sendMessage: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<ConversationConsumersService>(
       ConversationConsumersService,
     );
+  });
+
+  afterEach(async () => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {

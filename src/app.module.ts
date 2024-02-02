@@ -5,10 +5,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import mongodb from 'config/mongodb.config';
 import { AuthModule } from 'auth/auth.module';
 import { ConversationsModule } from './conversations/conversations.module';
-import { EventsModule } from './events/events.module';
 import jwt from 'config/jwt.config';
 import rabbitmq from 'config/rabbitmq.config';
 import { EventHandlersModule } from './event-handlers/event-handlers.module';
+import { WebsocketsModule } from './websockets/websockets.module';
 
 @Module({
   imports: [
@@ -24,8 +24,8 @@ import { EventHandlersModule } from './event-handlers/event-handlers.module';
         configService.get('mongodb'),
     }),
     ConversationsModule,
-    EventsModule,
     EventHandlersModule,
+    WebsocketsModule,
   ],
 })
 export class AppModule {}
