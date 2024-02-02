@@ -50,6 +50,7 @@ export class ConversationsController {
       const messageData = {
         message: createConversation.message,
         sender: currentUserObjectId,
+        receiver: new Types.ObjectId(toUserId)
       };
 
       const message = await this.conversationService.addMessage(

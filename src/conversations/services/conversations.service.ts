@@ -33,7 +33,7 @@ export class ConversationsService {
 
   async addMessage(
     conversation: Conversation,
-    messageData: Partial<Message>,
+    messageData: Message,
   ): Promise<Message> {
     const newMessage = new this.messageModel(messageData);
     conversation.messages.push(newMessage);

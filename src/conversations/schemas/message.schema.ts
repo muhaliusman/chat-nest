@@ -8,16 +8,17 @@ export type MessageDocument = HydratedDocument<Message>;
   autoCreate: false,
 })
 export class Message {
-  _id: Types.ObjectId;
-
   @Prop({ type: Types.ObjectId, ref: 'User' }) // Reference the User schema
   sender: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User' }) // Reference the User schema
+  receiver: Types.ObjectId;
 
   @Prop()
   message: string;
 
   @Prop({ default: Date.now })
-  timestamp: Date;
+  timestamp?: Date;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);
