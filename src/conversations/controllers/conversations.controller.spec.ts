@@ -13,11 +13,14 @@ import { getModelToken } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { MessageProducersService } from 'message-producers/services/message-producers.service';
+import { MessageConsumersService } from 'message-consumers/services/message-consumers.service';
 
 describe('ConversationsController', () => {
   let controller: ConversationsController;
   let conversationService: ConversationsService;
   let usersService: UsersService;
+  let messageProducersService: MessageProducersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,6 +52,12 @@ describe('ConversationsController', () => {
             get: jest.fn(),
           },
         },
+        {
+          provide: MessageProducersService,
+          useValue: {
+            sendMessageToBroker: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -56,10 +65,13 @@ describe('ConversationsController', () => {
     conversationService =
       module.get<ConversationsService>(ConversationsService);
     usersService = module.get<UsersService>(UsersService);
+    messageProducersService = module.get<MessageProducersService>(
+      MessageProducersService,
+    );
   });
 
   describe('createConversation', () => {
-    it('should create conversation and return success response', async () => {
+    it('should create conversation, return success response and send message to broker', async () => {
       const toUserId = new Types.ObjectId();
       const currentUserId = new Types.ObjectId();
       const createConversationDTO: CreateConversationDTO = {
@@ -84,13 +96,16 @@ describe('ConversationsController', () => {
         .spyOn(usersService, 'findOneById')
         .mockResolvedValue({ _id: toUserId, username: 'toUser' } as User);
 
+      const message = {
+        _id: new Types.ObjectId(),
+        message: 'Hello, this is a test message',
+        sender: currentUserId,
+        receiver: toUserId,
+      };
+
       const addMessageSpy = jest
         .spyOn(conversationService, 'addMessage')
-        .mockResolvedValue({
-          _id: new Types.ObjectId(),
-          message: 'Hello, this is a test message',
-          sender: currentUserId,
-        } as unknown as Message);
+        .mockResolvedValue(message);
 
       const result = await controller.createConversation(
         createConversationDTO,
@@ -102,6 +117,10 @@ describe('ConversationsController', () => {
         currentUserId.toString(),
         toUserId.toString(),
       ]);
+      expect(messageProducersService.sendMessageToBroker).toHaveBeenCalledWith(
+        MessageConsumersService.NEW_CONVERSATION_MESSAGE,
+        message,
+      );
       expect(findOneByIdSpy).toHaveBeenCalledWith(toUserId.toString());
       expect(addMessageSpy).toHaveBeenCalled();
       expect(result).toEqual({
@@ -111,6 +130,7 @@ describe('ConversationsController', () => {
           _id: expect.any(Types.ObjectId),
           message: 'Hello, this is a test message',
           sender: expect.any(Types.ObjectId),
+          receiver: expect.any(Types.ObjectId),
         },
       });
     });

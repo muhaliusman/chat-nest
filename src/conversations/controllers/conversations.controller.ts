@@ -14,6 +14,8 @@ import { CreateConversationDTO } from 'conversations/dto/create-conversation.dto
 import { ConversationsService } from 'conversations/services/conversations.service';
 import { Response } from 'express';
 import { ResponseHelper, ResponseObject } from 'helpers/response.helper';
+import { MessageConsumersService } from 'message-consumers/services/message-consumers.service';
+import { MessageProducersService } from 'message-producers/services/message-producers.service';
 import { Types } from 'mongoose';
 import { UsersService } from 'users/services/users.service';
 
@@ -22,6 +24,7 @@ export class ConversationsController {
   constructor(
     private readonly conversationService: ConversationsService,
     private readonly usersService: UsersService,
+    private readonly messageProducer: MessageProducersService,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -50,7 +53,7 @@ export class ConversationsController {
       const messageData = {
         message: createConversation.message,
         sender: currentUserObjectId,
-        receiver: new Types.ObjectId(toUserId)
+        receiver: new Types.ObjectId(toUserId),
       };
 
       const message = await this.conversationService.addMessage(
@@ -58,6 +61,10 @@ export class ConversationsController {
         messageData,
       );
 
+      await this.messageProducer.sendMessageToBroker(
+        MessageConsumersService.NEW_CONVERSATION_MESSAGE,
+        message,
+      );
       return ResponseHelper.success('Message sent successfully', message);
     } catch (error: unknown) {
       return ResponseHelper.error(res, error);

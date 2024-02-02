@@ -86,7 +86,7 @@ describe('ConversationsService', () => {
       const messageData = {
         message: 'Hello, world!',
         sender: new Types.ObjectId(),
-        receiver: new Types.ObjectId()
+        receiver: new Types.ObjectId(),
       };
       const conversation = new MockConversationModel({
         messages: [],
