@@ -6,7 +6,17 @@ import { UsersService } from './services/users.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeatureAsync([
+      {
+        name: User.name,
+        useFactory: () => {
+          const schema = UserSchema;
+          schema.plugin(require('mongoose-unique-validator'));
+
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [UsersController],
   providers: [UsersService],
