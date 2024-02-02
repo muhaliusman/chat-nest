@@ -40,4 +40,8 @@ export class UsersService {
       .select(withPassword ? '+password' : '-password')
       .exec();
   }
+
+  async findOneById(id: string): Promise<User | null> {
+    return this.userModel.findById(id).exec();
+  }
 }

@@ -11,17 +11,15 @@ import { getModelToken } from '@nestjs/mongoose';
 describe('UsersController', () => {
   let controller: UsersController;
   let service: UsersService;
-  let userModel: Model<User>;
 
   beforeEach(async () => {
-    userModel = {} as Model<User>;
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
         UsersService,
         {
           provide: getModelToken(User.name),
-          useValue: userModel,
+          useValue: {} as Model<User>,
         },
       ],
     }).compile();

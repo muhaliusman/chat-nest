@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import mongodb from 'config/mongodb.config';
 import { AuthModule } from 'auth/auth.module';
+import { ConversationsModule } from './conversations/conversations.module';
 import jwt from 'config/jwt.config';
 
 @Module({
@@ -19,6 +20,7 @@ import jwt from 'config/jwt.config';
       useFactory: async (configService: ConfigService) =>
         configService.get('mongodb'),
     }),
+    ConversationsModule,
   ],
 })
 export class AppModule {}
