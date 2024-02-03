@@ -10,7 +10,7 @@ async function bootstrap() {
   app.connectMicroservice({
     transport: Transport.RMQ,
     options: {
-      urls: [configService.get('rabbitmq.uri')],
+      urls: configService.get('rabbitmq.uri'),
     },
   });
 
