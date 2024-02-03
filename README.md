@@ -106,9 +106,34 @@ npm t
 | `username`      | `string` | **Required**. your username |
 | `password`      | `string` | **Required**. your password |
 
+#### Send Message
+```http
+  POST /conversations
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `userId`      | `string` | **Required**. receiver user |
+| `message`      | `string` | **Required**. your message |
+
+| Headers | value  |
+| :-------- | :------- |
+| `Authorization`      | **Required**. Bearer ${token from login response} |
+
 #### Websocket
 
 ```ws
   ws://localhost:3000
 ```
 *important: Websocket event to listen `conversation_${active_user_id}_${sender_message_id}`*
+
+## How To Test
+1. create new user via `Store new user endpoint`
+2. create another user
+3. login via `login endpoint`
+4. first user open postman and connect to websocket (don't forget to attach jwt token into header)
+5. for event name use this: `conversation_${active_user_id}_${sender_message_id}`
+5. second user send message to first user via Send Message endpoint
+
+#### Postman testing to subscribe and listen websocket
+![Postman](https://i.ibb.co/8sDKZ1J/Screen-Shot-2024-02-03-at-14-39-29.png)
