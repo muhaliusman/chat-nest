@@ -71,6 +71,11 @@ Install with docker compose
   # run docker-compose
   docker-compose up
 ```
+## Unit Test
+This project has implemented unit tests in it. To run it, just run
+```bash
+npm t
+```
 ## API Reference
 
 #### Get all users (no need auth)
