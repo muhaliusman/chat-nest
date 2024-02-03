@@ -1,73 +1,109 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Chat App With Nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This is a simple project from nestjs. This project is a Web API for chat applications using websocket and rabbitmq. This project is not intended for applications that will be used for production. only used for examples of using nestjs, rabbitmq, and websocket.
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Simple Architecture
+
+![App Architecture](https://i.ibb.co/cttw0By/chat-nest-drawio.png)
+
+## RabbitMQ Message Handler Flow
+
+![RabbitMQ Message Handler Flow](https://i.ibb.co/2hPWYdK/chat-nest-rabbit-drawio.png)
+## Requirement
+Stack | Min. version |
+--- | --- |
+NodeJs | 18.0.0 |
+MongoDB | 6.0.0 |
+RabbitMq | 3.0.0 |
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`MONGODB_URI`= your mongodb uri
+
+`JWT_SECRET`= random jwt secret
+
+`JWT_EXPIRATION`= jwt expiration duration
+
+`RABBITMQ_URI`= your rabbitmq uri
 
 ## Installation
 
 ```bash
-$ npm install
+  # clone repository
+  https://github.com/muhaliusman/chat-nest.git
+
+  # go to the directory
+  cd chat-nest
+
+  # copy .env.example
+  cp .env.example .env
+
+  # adjust existing parameters
+  vim .env
+
+  # install dependency
+  npm install
+
+  # run the project (Development mode)
+  npm run start:dev
+
+  # access it via localhost:3000
+
+  # for (Production mode)
+  npm run build
+
+  # run the project
+  node dist/main.ts
 ```
 
-## Running the app
-
+Install with docker compose
 ```bash
-# development
-$ npm run start
+  # clone repository
+  https://github.com/muhaliusman/chat-nest.git
 
-# watch mode
-$ npm run start:dev
+  # go to the directory
+  cd chat-nest
 
-# production mode
-$ npm run start:prod
+  # run docker-compose
+  docker-compose up
+```
+## API Reference
+
+#### Get all users (no need auth)
+
+```http
+  GET /users
 ```
 
-## Test
+#### Store new user (no need auth)
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```http
+  POST /users
 ```
 
-## Support
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `username` | `string` | **Required**. unique username |
+| `password` | `string` | **Required**. password min 6 |
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+#### Login
 
-## Stay in touch
+```http
+  POST /auth/login
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `username`      | `string` | **Required**. your username |
+| `password`      | `string` | **Required**. your password |
 
-## License
+#### Websocket
 
-Nest is [MIT licensed](LICENSE).
+```ws
+  ws://localhost:3000
+```
+*important: Websocket event to listen `conversation_${active_user_id}_${sender_message_id}`*
